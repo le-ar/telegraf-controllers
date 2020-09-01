@@ -20,9 +20,9 @@ export function controller(name: string) {
     return (constructor: any) => {
         var original = constructor;
 
-        function construct(constructor: any, args: any[]) {
+        function construct(constructor: any, ...args: any[]) {
             var c: any = function () {
-                return constructor.bind(this, args);
+                return constructor.bind(this, ...args);
             }
             c.prototype = constructor.prototype;
             return new new c()();
@@ -33,7 +33,7 @@ export function controller(name: string) {
 
             getAllActions(actions, constructor.prototype);
 
-            let obj = construct(original, args);
+            let obj = construct(original, ...args);
 
             obj.name = name;
             obj.actions = actions;
@@ -75,15 +75,19 @@ export class Controller {
 }
 
 export default class Router {
-    controllers: { [key: string]: Controller };
-    updateUserRoute: (route: string, routeData: any, userId: any) => Promise<any>;
+    private controllers: { [key: string]: Controller };
+    private updateUserRoute: (route: string, routeData: any, userId: any) => Promise<any>;
 
     constructor(controllers: Controller[] = [], updateUserRoute: (route: string, routeData: any, userId: any) => Promise<any>) {
         this.controllers = controllers.reduce((acc, val) => Object.assign(acc, { [val.name]: val }), {});
         this.updateUserRoute = updateUserRoute;
     }
 
-    async route(userId: any, route: string, isRedirect: boolean, ...args: any[]) {
+    async go(userId: any, route: string, ...args: any[]) {
+        return await this.route(userId, route, false, ...args);
+    }
+
+    private async route(userId: any, route: string, isRedirect: boolean, ...args: any[]) {
         let controller = route.split('/')[0];
         if (this.controllers.hasOwnProperty(controller)) {
             return await this.controllers[controller].routing({ route, changeRoute: this.generateChangeRoute(userId, ...args), isRedirect }, ...args)
@@ -92,7 +96,7 @@ export default class Router {
         throw new Error(`Controller ${controller} not found`);
     }
 
-    generateChangeRoute(userId: any, ...args: any[]) {
+    private generateChangeRoute(userId: any, ...args: any[]) {
         return async (route: string, routeData?: any) => {
             let newRouteData = null;
             if (typeof routeData !== 'undefined') {
