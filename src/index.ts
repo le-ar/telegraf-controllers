@@ -145,7 +145,7 @@ export default class Router {
             let controller = this.controllers[controllerName];
 
             for (let rule of controller.rulesController) {
-                if (! await rule.rule({ route, changeRoute, isRedirect }, ...args)) {
+                if (! await rule.rule.call(controller, { route, changeRoute, isRedirect }, ...args)) {
                     if (typeof rule.onRuleError !== 'undefined') {
                         return await rule.onRuleError({ route, changeRoute, isRedirect }, ...args);
                     }
