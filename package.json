@@ -1,6 +1,6 @@
 {
   "name": "telegraf-controllers",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "main": "build/index.js",
   "license": "MIT",
   "author": "le-ar",
@@ -8,6 +8,7 @@
     "type": "git",
     "url": "git+https://github.com/le-ar/telegraf-controllers.git"
   },
+  "keywords": ["telegraf", "telegraf-controllers", "telegram", "bot", "controller", "rule", "telegram bot"],
   "scripts": {
     "prepublish": "tsc"
   },
